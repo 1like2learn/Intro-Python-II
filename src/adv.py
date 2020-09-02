@@ -1,4 +1,5 @@
 from room import Room
+from player import Player
 
 # Declare all the rooms
 
@@ -33,6 +34,7 @@ room['narrow'].w_to = room['foyer']
 room['narrow'].n_to = room['treasure']
 room['treasure'].s_to = room['narrow']
 
+# print(room['outside'].n_to)
 #
 # Main
 #
@@ -49,3 +51,43 @@ room['treasure'].s_to = room['narrow']
 # Print an error message if the movement isn't allowed.
 #
 # If the user enters "q", quit the game.
+
+room_key_list = list(room.keys()) 
+room_val_list = list(room.values()) 
+
+player = Player("p1")
+
+quit = False
+while quit is False:
+    print(f"\nYou are at the {room[player.current_room].name}")
+    print(room[player.current_room].description)
+    action = input("\nDo you go n, e, s, w, or q? ")
+
+    if action == "n":
+        if hasattr(room[player.current_room], 'n_to'):
+            player.current_room = room_key_list[room_val_list.index(room[player.current_room].n_to)]
+        else:
+            print("\nYou can't go that north.")
+
+    elif action == "e":
+        if hasattr(room[player.current_room], 'e_to'):
+            player.current_room = room_key_list[room_val_list.index(room[player.current_room].e_to)]
+        else:
+            print("\nYou can't go that east.")
+
+    elif action == "s":
+        if hasattr(room[player.current_room], 's_to'):
+            player.current_room = room_key_list[room_val_list.index(room[player.current_room].s_to)]
+        else:
+            print("\nYou can't go that south.")
+
+    elif action == "w":
+        if hasattr(room[player.current_room], 'w_to'):
+            player.current_room = room_key_list[room_val_list.index(room[player.current_room].w_to)]
+        else:
+            print("\nYou can't go that west.")
+
+    elif action == "q":
+        quit = True
+    else:
+        print("That is not a valid input")
