@@ -1,11 +1,16 @@
 from room import Room
 from player import Player
+from item import Item
 
 # Declare all the rooms
 
 room = {
     'outside':  Room("Outside Cave Entrance",
                      "North of you, the cave mount beckons"),
+
+    'meadow': Room("Secluded Meadow", 
+    """Light filters into the tranquil meadow and illuminates
+    a small mound of disturbed earth"""),
 
     'foyer':    Room("Foyer", """Dim light filters in from the south. Dusty
 passages run north and east."""),
@@ -26,6 +31,8 @@ earlier adventurers. The only exit is to the south."""),
 # Link rooms together
 
 room['outside'].n_to = room['foyer']
+room['outside'].e_to = room['meadow']
+room['meadow'].w_to = room['outside']
 room['foyer'].s_to = room['outside']
 room['foyer'].n_to = room['overlook']
 room['foyer'].e_to = room['narrow']
@@ -33,6 +40,12 @@ room['overlook'].s_to = room['foyer']
 room['narrow'].w_to = room['foyer']
 room['narrow'].n_to = room['treasure']
 room['treasure'].s_to = room['narrow']
+
+#Add items to rooms
+
+room['overlook'].__add_item__(Item("shovel", "A worn but sturdy shovel."))
+
+room['meadow'].__add_item__(Item("lamp", "A dusty but functional gas oil lamp."))
 
 # print(room['outside'].n_to)
 #
