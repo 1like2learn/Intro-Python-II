@@ -18,3 +18,5 @@ class Room:
 
   def call_remove_item(self, item):
     self.__remove_item__(item)
+  # def __str__(self):
+  #   self.keys()

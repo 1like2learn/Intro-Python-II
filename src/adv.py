@@ -27,6 +27,12 @@ chamber! Sadly, it has already been completely emptied by
 earlier adventurers. The only exit is to the south."""),
 }
 
+# Create the player
+player = Player("p1")
+
+#The room the player starts in
+
+player.current_room = room['outside']
 
 # Link rooms together
 
@@ -41,11 +47,21 @@ room['narrow'].w_to = room['foyer']
 room['narrow'].n_to = room['treasure']
 room['treasure'].s_to = room['narrow']
 
+#Is the room illuminated
+
+room['outside'].is_light = True
+room['meadow'].is_light = True
+room['foyer'].is_light = True
+room['overlook'].is_light = True
+room['narrow'].is_light = False
+room['treasure'].is_light = False
+
 #Add items to rooms
 
-room['overlook'].__add_item__(Item("shovel", "A worn but sturdy shovel."))
+shovel = Item("shovel", "a worn but sturdy shovel.")
+lamp = Item("lamp", "a dusty but functional gas oil lamp.")
 
-room['meadow'].__add_item__(Item("lamp", "A dusty but functional gas oil lamp."))
+room['overlook'].__add_item__(shovel)
 
 # print(room['outside'].n_to)
 #
@@ -65,42 +81,64 @@ room['meadow'].__add_item__(Item("lamp", "A dusty but functional gas oil lamp.")
 #
 # If the user enters "q", quit the game.
 
-room_key_list = list(room.keys()) 
-room_val_list = list(room.values()) 
-
-player = Player("p1")
-
+lantern_found = False
 quit = False
 while quit is False:
-    print(f"\nYou are at the {room[player.current_room].name}")
-    print(room[player.current_room].description)
-    action = input("\nDo you go n, e, s, w, or q? ")
+    current_room = player.current_room
+    print(f"\nYou are at the {current_room.name}")
 
-    if action == "n":
-        if hasattr(room[player.current_room], 'n_to'):
-            player.current_room = room_key_list[room_val_list.index(room[player.current_room].n_to)]
-        else:
-            print("\nYou can't go that north.")
-
-    elif action == "e":
-        if hasattr(room[player.current_room], 'e_to'):
-            player.current_room = room_key_list[room_val_list.index(room[player.current_room].e_to)]
-        else:
-            print("\nYou can't go that east.")
-
-    elif action == "s":
-        if hasattr(room[player.current_room], 's_to'):
-            player.current_room = room_key_list[room_val_list.index(room[player.current_room].s_to)]
-        else:
-            print("\nYou can't go that south.")
-
-    elif action == "w":
-        if hasattr(room[player.current_room], 'w_to'):
-            player.current_room = room_key_list[room_val_list.index(room[player.current_room].w_to)]
-        else:
-            print("\nYou can't go that west.")
-
-    elif action == "q":
-        quit = True
+    if current_room.is_light or lamp in player.inventory:
+        print(current_room.description)
+        if len(current_room.items) > 0:
+            for item in current_room.items:
+                print(f"\nThere is a {item.name} here.\nIt is {item.description}")
     else:
-        print("That is not a valid input")
+        print("It's pitch black!")
+        
+    action = input("\nDo you go n, e, s, w, or q? ").split(' ')
+
+    if action[0] == "n" and len(action) == 1:
+        player.call_move('n_to')
+
+    elif action[0] == "e" and len(action) == 1:
+        player.call_move('e_to')
+
+    elif action[0] == "s" and len(action) == 1:
+        player.call_move('s_to')
+
+    elif action[0] == "w" and len(action) == 1:
+        player.call_move('w_to')
+    
+    elif action[0] == "get" and len(action) == 2:
+        player.call_pickup_item(action[1])
+    
+    elif action[0] == "drop" and len(action) == 2:
+        player.call_drop_item(action[1])
+
+    elif action[0] == "dig" and len(action) == 1:
+        if player.current_room == room['meadow'] and not lantern_found and shovel in player.inventory:
+            print("\nYou found a gas lantern to light your way")
+            player.call_pickup_item(lamp)
+            lantern_found = True
+            room['meadow'].description = """Light filters into the tranquil meadow and illuminates
+a small hole you dug"""
+
+        elif player.current_room == room['meadow'] and not lantern_found and not shovel in player.inventory:
+            print("\nYou spend a few minutes dirtying your fingers and give up when you grow tired.")
+
+        elif player.current_room == room['meadow'] and lantern_found and shovel in player.inventory:
+            print("\nYou dig a few more holes but find nothing")
+            room['meadow'].description = """The once tranquil meadow looks like a troop
+of coked out miners tried to dig a latrine."""
+
+        elif player.current_room == room['meadow'] :
+            print("\nYou can't dig here.")
+
+    elif action[0] == "i" and len(action) == 1:
+        player.call_check_inventory()
+
+    elif action[0] == "q" and len(action) == 1:
+        quit = True
+
+    else:
+        print("\nThat is not a valid input")
