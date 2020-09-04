@@ -50,3 +50,9 @@ class Player:
 
   def call_check_inventory(self):
     self.__check_inventory__()
+  
+  def __get_hidden_item(self, item):
+    self.inventory.append(item)
+
+  def call_get_hidden_item(self, item):
+    self.__get_hidden_item(item)
